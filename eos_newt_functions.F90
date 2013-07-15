@@ -70,9 +70,11 @@ CONTAINS
             nr_eos_deriv(1,2) = dptRow(nr_eos_k)/abs(nr_eos_pres)*nr_eos_scale(2)
             nr_eos_deriv(2,1) = dsdRow(nr_eos_k)/abs(nr_eos_entr)*nr_eos_scale(1)
             nr_eos_deriv(2,2) = dstRow(nr_eos_k)/abs(nr_eos_entr)*nr_eos_scale(2)
-        else
+        elseif (nr_eos_mode .eq. MODE_PRES_TEMP) then
             newt_eos(1) = (ptotRow(nr_eos_k) - nr_eos_pres)/abs(nr_eos_pres)
             nr_eos_deriv(1,1) = dpdRow(nr_eos_k)/abs(nr_eos_pres)*nr_eos_scale(1)
+        else
+            call Driver_abortFlash('ERROR: Incorrect EOS mode specified.')
         endif
 #ifdef DEBUG_EOS
         !if (nr_eos_deriv .eq. 0.0) call Driver_abortFlash('Error: Eos Derivative is zero!')
