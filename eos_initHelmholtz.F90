@@ -231,7 +231,7 @@ subroutine eos_initHelmholtz()
   eos_type=EOS_HLM
 
   ! Added by JFG
-  call RuntimeParameters_get('larget', eos_larget)
+  call RuntimeParameters_get('eos_larget', eos_larget)
   ! End JFG
 
   return

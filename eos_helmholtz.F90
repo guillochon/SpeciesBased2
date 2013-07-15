@@ -248,8 +248,8 @@ subroutine eos_helmholtz(mode,vecLen,eosData,massFrac,mask)
 
   ! Added by JFG
   use Grid_data, ONLY: gr_smallrho
-  use newt_wrappers
-  use eos_newt_functions
+  use newt_wrappers, ONLY: run_annewt
+  use eos_newt_functions, ONLY: newt_eos
   ! End JFG
 
   !$ use omp_lib
@@ -297,6 +297,10 @@ subroutine eos_helmholtz(mode,vecLen,eosData,massFrac,mask)
   if(.not.present(massFrac)) then
      call Driver_abortFlash("[Eos] Helmholtz needs mass fractions")
   end if
+
+  ! Added by JFG
+  eos_failed = .false.
+  ! End JFG
 
   vecBegin = 1
   vecEnd = vecLen
@@ -613,6 +617,10 @@ subroutine eos_helmholtz(mode,vecLen,eosData,massFrac,mask)
   else if (mode==MODE_PRES_TEMP) then
      nr_eos_mode = mode
 
+     pwantRow(1:vecLen) = eosData(pres+1:pres+vecLen)   ! store desired pressure for mode=3 case
+     if (eos_forceConstantInput) then
+        psaveRow = pwantRow
+     end if
      call eos_helm(vecBegin,vecEnd)
      !  Now eos_helm has returned ptotRow, etotRow, detRow, and gamcRow
 
@@ -645,6 +653,12 @@ subroutine eos_helmholtz(mode,vecLen,eosData,massFrac,mask)
   else if (mode==MODE_PRES_ENTR) then
      nr_eos_mode = mode
 
+     pwantRow(1:vecLen) = eosData(pres+1:pres+vecLen)   ! store desired pressure for mode=3 case
+     swantRow(1:vecLen) = eosData(entr+1:entr+vecLen)   ! store desired pressure for mode=3 case
+     if (eos_forceConstantInput) then
+        psaveRow = pwantRow
+        ssaveRow = swantRow
+     end if
      call eos_helm(vecBegin,vecEnd)
      !  Now eos_helm has returned ptotRow, etotRow, detRow, and gamcRow
 
