@@ -1,12 +1,6 @@
 #  Configuration file for helmholtz eos, with Species used
-#  [physics/Eos/EosMain/Helmholtz/SpeciesBased2]
+#  [physics/Eos/EosMain/Helmholtz/SpeciesBased]
 REQUESTS Multispecies/MultispeciesMain
-REQUIRES flashUtilities/numericalRecipes
-
-PARAMETER eos_largeT REAL 0.0e0
-
-PARAMETER eos_smallgamc REAL 1.01e0
-PARAMETER eos_largegamc REAL 5.0e0
 
 D eos_singleSpeciesA  Single-species nucleon number for the gas 
 D &         (only used by Eos/Helmholtz when compiled w/o Multispecies)
@@ -15,5 +9,6 @@ D eos_singleSpeciesZ  Single-species proton number for the gas
 D &         (only used Eos/Helmholtz when compiled w/o Multispecies)
 PARAMETER eos_singleSpeciesZ         REAL    1.00  [0.0 to ]
 
-VARIABLE gamc  EOSMAP:   GAMC  # sound-speed gamma
-VARIABLE game  EOSMAPOUT:GAME  # energy gamma
+D Added by JFG
+REQUIRES flashUtilities/numericalRecipes
+PARAMETER eos_largeT REAL 0.0e0

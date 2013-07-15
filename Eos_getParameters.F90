@@ -57,7 +57,8 @@
 subroutine Eos_getParameters(eintSwitch,inputsAreUnchanged,inputTempIsGuess,constantGammaC,&
      inputMassFracNeeded,smalle)
 
-  use Eos_data, ONLY : eos_smalle, eos_eintSwitch, eos_forceConstantInput
+  use Eos_data, ONLY : eos_smalle, eos_eintSwitch
+  use eos_helmData, ONLY : eos_forceConstantInput
   use Driver_interface, ONLY : Driver_abortFlash
   implicit none
 

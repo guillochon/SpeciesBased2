@@ -8,7 +8,7 @@ CONTAINS
         use nrtype
         use Driver_interface, ONLY: Driver_abortFlash
         use Eos_interface, ONLY: Eos
-        use Eos_data, ONLY: nr_eos_mode, nr_eos_eint, nr_eos_pres, nr_eos_entr, nr_eos_deriv, nr_eos_k, &
+        use Eos_helmData, ONLY: nr_eos_mode, nr_eos_eint, nr_eos_pres, nr_eos_entr, nr_eos_deriv, nr_eos_k, &
             eos_smallt, eos_larget, nr_eos_scale, nr_eos_limited, nr_eos_lim_cnt
         use eos_vecData, ONLY: denRow, tempRow, etotRow, ptotRow, stotRow, dptRow, detRow, dpdRow, dstRow, dsdRow
         use Grid_data, ONLY: gr_smallrho
