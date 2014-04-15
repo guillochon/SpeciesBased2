@@ -489,109 +489,28 @@ subroutine eos_helmholtz(mode,vecLen,eosData,massFrac,mask)
         eosData(eint+1:eint+vecLen) = etotRow(1:vecLen)
      end if
 
-
-     !==============================================================================
-
-     !      MODE_DENS_PRES  pressure and density given
-
+  ! Added by JFG
   else if (mode==MODE_DENS_PRES) then
+     nr_eos_mode = mode
 
      pwantRow(1:vecLen) = eosData(pres+1:pres+vecLen)   ! store desired pressure for mode=3 case
      if (eos_forceConstantInput) then
         psaveRow = pwantRow
      end if
-     ! Initialize the errors
-     error(:) = 0.0e0
-
-     ! Do the first eos call with all the zones in the pipe
      call eos_helm(vecBegin,vecEnd)
-
-     do k = vecBegin, vecEnd
-
-        tnew(k) = tempRow(k) - (ptotRow(k) - pwantRow(k))  & 
-             &           / dptRow(k)
-
-        ! Don't allow the temperature to change by more than an order of magnitude 
-        ! in a single iteration
-        if (tnew(k) .GT. 10.e0*tempRow(k)) tnew(k) =  & 
-             &           10.e0*tempRow(k)
-        if (tnew(k) .LT. 0.1e0*tempRow(k)) tnew(k) =  & 
-             &           0.1e0*tempRow(k)
-
-        ! Compute the error
-        error(k) = abs((tnew(k) - tempRow(k)) / tempRow(k))
-
-        ! Store the new temperature
-        tempRow(k) = tnew(k)
-
-        ! Check if we are freezing, if so set the temperature to smallt, and adjust 
-        ! the error so we don't wait for this one
-        if (tempRow(k) .LT. eos_smallt) then
-           tempRow(k) = eos_smallt
-           error(k)    = 0.1*eos_tol
-        endif
-
-     enddo
+     !  Now eos_helm has returned ptotRow, etotRow, detRow, and gamcRow
 
      ! Loop over the zones individually now
      do k = vecBegin, vecEnd
-
-        do i = 2, eos_maxNewton
-
-           if (error(k) .LT. eos_tol) goto 170
-
-           ! do eos only over this single item
-           call eos_helm(k,k)
-
-           tnew(k) = tempRow(k) - (ptotRow(k) - pwantRow(k))  & 
-                &              / dptRow(k)
-
-           ! Don't allow the temperature to change by more than an order of magnitude 
-           ! in a single iteration
-           if (tnew(k) .GT. 10.e0*tempRow(k)) tnew(k) =  & 
-                &              10.e0*tempRow(k)
-           if (tnew(k) .LT. 0.1e0*tempRow(k)) tnew(k) =  & 
-                &              0.1e0*tempRow(k)
-
-           ! Compute the error
-           error(k) = abs((tnew(k) - tempRow(k)) / tempRow(k))
-
-           ! Store the new temperature
-           tempRow(k) = tnew(k)
-
-           ! Check if we are freezing, if so set the temperature to eos_smallt, and adjust 
-           ! the error so we don't wait for this one
-           if (tempRow(k) .LT. eos_smallt) then
-              tempRow(k) = eos_smallt
-              error(k)    = .1*eos_tol
-           endif
-
-        enddo
-
-        ! Land here if too many iterations are needed
-
-        print *, ' '
-        print *, 'Newton-Raphson failed in Helmholtz Eos:'
-        print *, '(p and rho as input)'
-        print *, ' '
-        print *, 'too many iterations'
-        print *, ' '
-        print *, ' k    = ', k,vecBegin,vecEnd
-        print *, ' temp = ', tempRow(k)
-        print *, ' dens = ', denRow(k)
-        print *, ' pres = ', ptotRow(k)
-
-        call Driver_abortFlash('[Eos] Error: too many iteration in Eos')
-
-
-        ! Land here if the Newton iteration converged
-
-170     continue
-
-     enddo
+        input = 1.0d0
+        nr_eos_scale(1) = tempRow(k)
+        nr_eos_pres = pwantRow(k)
+        nr_eos_k = k
+        call run_annewt(newt_eos, 1, eos_tol, input(1), output(1), eos_failed)
+        tempRow(k) = max(nr_eos_scale(1)*output(1), eos_smallt)
+     end do
 
      ! Crank through the entire eos one last time
-
      call eos_helm(vecBegin,vecEnd)
 
      ! Fill the FLASH arrays with the results.  
@@ -607,13 +526,6 @@ subroutine eos_helmholtz(mode,vecLen,eosData,massFrac,mask)
      else
         eosData(pres+1:pres+vecLen) = ptotRow(1:vecLen)
      end if
-
-
-     !==============================================================================
-
-     ! Unknown EOS mode selected
-
-  ! Added by JFG
   else if (mode==MODE_PRES_TEMP) then
      nr_eos_mode = mode
 
