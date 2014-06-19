@@ -1,3 +1,5 @@
+DATAFILES speciesbased2.h
+
 #  Configuration file for helmholtz eos, with Species used
 #  [physics/Eos/EosMain/Helmholtz/SpeciesBased]
 REQUESTS Multispecies/MultispeciesMain
