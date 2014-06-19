@@ -15,6 +15,7 @@ CONTAINS
         use Grid_data, ONLY: gr_smallrho
         implicit none
 #include "constants.h"
+#include "Flash.h"
 #include "Eos.h"
 
         real, dimension(:), intent(in) :: x
